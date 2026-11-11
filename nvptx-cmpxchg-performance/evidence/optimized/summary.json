@@ -1,0 +1,243 @@
+{
+  "status": "Published as the optimization follow-up in upstream PR #240760",
+  "baseline_pr_commit": "ed3ec9f6e94d6b21487b890824fc5f9bb168baf7",
+  "candidate_tree": "7a514a41d171f551fd739adebeacee11f41aa6cb",
+  "changes": [
+    "Use ordinary generic loads/stores on the branch proven to be local, avoiding explicit local-address conversion",
+    "For a CAS immediately followed by extraction and return of one component, return separately on both paths and place the native path first"
+  ],
+  "device": "NVIDIA Thor, sm_110, 20 SMs",
+  "tools": "LLVM O2, assertions enabled; CUDA 13.2.51 ptxas O3",
+  "method": "Real llc output; identical IR and launch configurations; 21 randomized paired samples after six warm-up pairs. Native-metadata controls only run on global/shared addresses.",
+  "replications": 2,
+  "relative_to_original_patch": [
+    {
+      "space": "global",
+      "mode": "serial",
+      "blocks": 1,
+      "threads_per_block": 1,
+      "iterations": 32768,
+      "control_median_ms": 9.17695999,
+      "guard_median_ms": 8.9429121,
+      "paired_median_change_pct": -2.555413,
+      "paired_p10_change_pct": -2.569767,
+      "paired_p90_change_pct": -2.539736
+    },
+    {
+      "space": "global",
+      "mode": "parallel",
+      "blocks": 32,
+      "threads_per_block": 128,
+      "iterations": 2048,
+      "control_median_ms": 0.628799975,
+      "guard_median_ms": 0.613023996,
+      "paired_median_change_pct": -2.483495,
+      "paired_p10_change_pct": -2.718496,
+      "paired_p90_change_pct": -2.109666
+    },
+    {
+      "space": "shared",
+      "mode": "serial",
+      "blocks": 1,
+      "threads_per_block": 1,
+      "iterations": 32768,
+      "control_median_ms": 4.30860806,
+      "guard_median_ms": 3.93091202,
+      "paired_median_change_pct": -8.772384,
+      "paired_p10_change_pct": -8.862767,
+      "paired_p90_change_pct": -8.71677
+    },
+    {
+      "space": "shared",
+      "mode": "parallel",
+      "blocks": 32,
+      "threads_per_block": 128,
+      "iterations": 2048,
+      "control_median_ms": 0.28115201,
+      "guard_median_ms": 0.256352007,
+      "paired_median_change_pct": -8.770334,
+      "paired_p10_change_pct": -9.218888,
+      "paired_p90_change_pct": -8.575337
+    },
+    {
+      "space": "local",
+      "mode": "serial",
+      "blocks": 1,
+      "threads_per_block": 1,
+      "iterations": 32768,
+      "control_median_ms": 4.99443197,
+      "guard_median_ms": 4.3798399,
+      "paired_median_change_pct": -12.308095,
+      "paired_p10_change_pct": -12.323518,
+      "paired_p90_change_pct": -12.281641
+    },
+    {
+      "space": "local",
+      "mode": "parallel",
+      "blocks": 32,
+      "threads_per_block": 128,
+      "iterations": 2048,
+      "control_median_ms": 0.32457599,
+      "guard_median_ms": 0.281951994,
+      "paired_median_change_pct": -13.188548,
+      "paired_p10_change_pct": -13.717416,
+      "paired_p90_change_pct": -12.323218
+    },
+    {
+      "space": "mixed-global-local",
+      "mode": "parallel",
+      "blocks": 32,
+      "threads_per_block": 128,
+      "iterations": 2048,
+      "control_median_ms": 0.850687981,
+      "guard_median_ms": 0.805535972,
+      "paired_median_change_pct": -5.318392,
+      "paired_p10_change_pct": -5.375208,
+      "paired_p90_change_pct": -5.186104
+    },
+    {
+      "space": "mixed-shared-local",
+      "mode": "parallel",
+      "blocks": 32,
+      "threads_per_block": 128,
+      "iterations": 2048,
+      "control_median_ms": 0.475327998,
+      "guard_median_ms": 0.422879994,
+      "paired_median_change_pct": -10.405924,
+      "paired_p10_change_pct": -11.230596,
+      "paired_p90_change_pct": -10.21323
+    },
+    {
+      "space": "mixed-global-shared",
+      "mode": "parallel",
+      "blocks": 32,
+      "threads_per_block": 128,
+      "iterations": 2048,
+      "control_median_ms": 0.65427202,
+      "guard_median_ms": 0.639840007,
+      "paired_median_change_pct": -2.195169,
+      "paired_p10_change_pct": -2.356667,
+      "paired_p90_change_pct": -2.041114
+    }
+  ],
+  "original_overhead_vs_native_control": [
+    {
+      "space": "global",
+      "mode": "serial",
+      "blocks": 1,
+      "threads_per_block": 1,
+      "iterations": 32768,
+      "control_median_ms": 7.83033609,
+      "guard_median_ms": 9.17788792,
+      "paired_median_change_pct": 17.209705,
+      "paired_p10_change_pct": 17.176801,
+      "paired_p90_change_pct": 17.228485
+    },
+    {
+      "space": "global",
+      "mode": "parallel",
+      "blocks": 32,
+      "threads_per_block": 128,
+      "iterations": 2048,
+      "control_median_ms": 0.543488026,
+      "guard_median_ms": 0.628895998,
+      "paired_median_change_pct": 15.508531,
+      "paired_p10_change_pct": 15.384165,
+      "paired_p90_change_pct": 15.962271
+    },
+    {
+      "space": "shared",
+      "mode": "serial",
+      "blocks": 1,
+      "threads_per_block": 1,
+      "iterations": 32768,
+      "control_median_ms": 2.81884789,
+      "guard_median_ms": 4.3082881,
+      "paired_median_change_pct": 52.827376,
+      "paired_p10_change_pct": 52.74516,
+      "paired_p90_change_pct": 52.902839
+    },
+    {
+      "space": "shared",
+      "mode": "parallel",
+      "blocks": 32,
+      "threads_per_block": 128,
+      "iterations": 2048,
+      "control_median_ms": 0.186880007,
+      "guard_median_ms": 0.281120002,
+      "paired_median_change_pct": 50.342699,
+      "paired_p10_change_pct": 48.224558,
+      "paired_p90_change_pct": 51.020064
+    }
+  ],
+  "optimized_overhead_vs_native_control": [
+    {
+      "space": "global",
+      "mode": "serial",
+      "blocks": 1,
+      "threads_per_block": 1,
+      "iterations": 32768,
+      "control_median_ms": 7.82953596,
+      "guard_median_ms": 8.9425602,
+      "paired_median_change_pct": 14.209925,
+      "paired_p10_change_pct": 14.177008,
+      "paired_p90_change_pct": 14.225115
+    },
+    {
+      "space": "global",
+      "mode": "parallel",
+      "blocks": 32,
+      "threads_per_block": 128,
+      "iterations": 2048,
+      "control_median_ms": 0.544575989,
+      "guard_median_ms": 0.612864017,
+      "paired_median_change_pct": 12.661801,
+      "paired_p10_change_pct": 12.383361,
+      "paired_p90_change_pct": 12.835917
+    },
+    {
+      "space": "shared",
+      "mode": "serial",
+      "blocks": 1,
+      "threads_per_block": 1,
+      "iterations": 32768,
+      "control_median_ms": 2.81967998,
+      "guard_median_ms": 3.93004799,
+      "paired_median_change_pct": 39.400336,
+      "paired_p10_change_pct": 39.318813,
+      "paired_p90_change_pct": 39.45969
+    },
+    {
+      "space": "shared",
+      "mode": "parallel",
+      "blocks": 32,
+      "threads_per_block": 128,
+      "iterations": 2048,
+      "control_median_ms": 0.187040001,
+      "guard_median_ms": 0.256191999,
+      "paired_median_change_pct": 37.074414,
+      "paired_p10_change_pct": 35.85387,
+      "paired_p90_change_pct": 37.303215
+    }
+  ],
+  "validation": {
+    "NVPTX_lit_passed": 700,
+    "original_runtime_fixture_passed": 36,
+    "tail_return_fixture_passed": 36,
+    "compile_groups_passed": 16,
+    "compiled_function_instances": 720,
+    "ptxas_groups_passed": 4,
+    "mixed_warp_output_checks": "all measured launches passed"
+  },
+  "limits": [
+    "Synthetic repeated out-of-line monotonic i32 CAS calls, not application slowdowns",
+    "Timed comparisons all succeed and threads own distinct words; failed comparisons are covered by separate runtime correctness checks",
+    "No timing evidence for contention or other GPUs",
+    "Native-metadata controls never run on local addresses",
+    "GPU clocks were not locked; paired measurements and repeat runs are recorded",
+    "BSSY/BSYNC overhead remains in the optimized device-call benchmark"
+  ],
+  "llvm_AI_policy": "https://llvm.org/docs/AIToolPolicy.html",
+  "next_step": "Await LLVM review; upstream CI status must be checked separately for the new head",
+  "published_commit": "ffb57dc24a0868fc4bb53a179e1e506f5b37a3c3"
+}

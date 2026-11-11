@@ -1,0 +1,138 @@
+[
+  {
+    "triple": "nvptx-nvidia-cuda",
+    "sm": "50",
+    "O": "0",
+    "functions": 40,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx-nvidia-cuda",
+    "sm": "50",
+    "O": "2",
+    "functions": 40,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx-nvidia-cuda",
+    "sm": "70",
+    "O": "0",
+    "functions": 40,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx-nvidia-cuda",
+    "sm": "70",
+    "O": "2",
+    "functions": 40,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx-nvidia-cuda",
+    "sm": "90",
+    "O": "0",
+    "functions": 50,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx-nvidia-cuda",
+    "sm": "90",
+    "O": "2",
+    "functions": 50,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx-nvidia-cuda",
+    "sm": "110",
+    "O": "0",
+    "functions": 50,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx-nvidia-cuda",
+    "sm": "110",
+    "O": "2",
+    "functions": 50,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx64-nvidia-cuda",
+    "sm": "50",
+    "O": "0",
+    "functions": 40,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx64-nvidia-cuda",
+    "sm": "50",
+    "O": "2",
+    "functions": 40,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx64-nvidia-cuda",
+    "sm": "70",
+    "O": "0",
+    "functions": 40,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx64-nvidia-cuda",
+    "sm": "70",
+    "O": "2",
+    "functions": 40,
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "triple": "nvptx64-nvidia-cuda",
+    "sm": "90",
+    "O": "0",
+    "functions": 50,
+    "exit": 0,
+    "stderr": "",
+    "ptxas_exit": 0,
+    "ptxas_stderr": ""
+  },
+  {
+    "triple": "nvptx64-nvidia-cuda",
+    "sm": "90",
+    "O": "2",
+    "functions": 50,
+    "exit": 0,
+    "stderr": "",
+    "ptxas_exit": 0,
+    "ptxas_stderr": ""
+  },
+  {
+    "triple": "nvptx64-nvidia-cuda",
+    "sm": "110",
+    "O": "0",
+    "functions": 50,
+    "exit": 0,
+    "stderr": "",
+    "ptxas_exit": 0,
+    "ptxas_stderr": ""
+  },
+  {
+    "triple": "nvptx64-nvidia-cuda",
+    "sm": "110",
+    "O": "2",
+    "functions": 50,
+    "exit": 0,
+    "stderr": "",
+    "ptxas_exit": 0,
+    "ptxas_stderr": ""
+  }
+]

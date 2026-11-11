@@ -1,0 +1,1078 @@
+{
+  "started_utc": "2026-11-11T03:46:33.983499+00:00",
+  "host": "Linux-6.8.12-tegra-aarch64-with-glibc2.39",
+  "arch": "sm_110",
+  "ptx_feature": "ptx91",
+  "llc_path": "/home/linyongwei/.cache/llvm-nvptx-pr/build/bin/llc",
+  "llc_sha256": "65edb4b40853d8750d0a3c945507b54bf812d4f7766977d9d1c825d96810bf8b",
+  "inputs_sha256": {
+    "minimal.ll": "7d7dd2e9866418463d4169960de03e7c03ddfa249c7d3d379a9d5e45f9b51f1a",
+    "runtime.ll": "0c2ab3bb059fa053ae4e0f8c04e043400aeaca6bb1114ba72638da3a2ab3ac8f",
+    "launch.cpp": "52dbb1a9578436434bfc6b7f48c65cdc26c4c43bee121b8411a6dca5f6c38c8b",
+    "run.py": "3869aae4fbb32e913070441c9e36eb9f29b367ed52ac76513f683b84dc00dbf5"
+  },
+  "commands": [
+    {
+      "name": "llc-version",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/build/bin/llc",
+        "--version"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "ptxas-version",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/ptxas",
+        "--version"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "build-launcher",
+      "argv": [
+        "g++",
+        "-std=c++17",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I/usr/local/cuda-13.2/include",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/perf-tail-return-runtime-source/launch.cpp",
+        "-lcuda",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "nvidia-smi",
+      "argv": [
+        "nvidia-smi"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "llc-minimal-O0",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/build/bin/llc",
+        "-O0",
+        "-mcpu=sm_110",
+        "-mattr=+ptx91",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/perf-tail-return-runtime-source/minimal.ll",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O0.ptx"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "assemble-minimal-O0-ptxasO0",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/ptxas",
+        "-arch=sm_110",
+        "-O0",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O0.ptx",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O0-ptxasO0.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "sass-minimal-O0-ptxasO0",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/nvdisasm",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O0-ptxasO0.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-minimal-O0-ptxasO0",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O0-ptxasO0.cubin",
+        "minimal"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "assemble-minimal-O0-ptxasO3",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/ptxas",
+        "-arch=sm_110",
+        "-O3",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O0.ptx",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O0-ptxasO3.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "sass-minimal-O0-ptxasO3",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/nvdisasm",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O0-ptxasO3.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-minimal-O0-ptxasO3",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O0-ptxasO3.cubin",
+        "minimal"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "llc-runtime-O0",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/build/bin/llc",
+        "-O0",
+        "-mcpu=sm_110",
+        "-mattr=+ptx91",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/perf-tail-return-runtime-source/runtime.ll",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0.ptx"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "assemble-runtime-O0-ptxasO0",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/ptxas",
+        "-arch=sm_110",
+        "-O0",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0.ptx",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO0.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "sass-runtime-O0-ptxasO0",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/nvdisasm",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO0.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO0-local-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO0.cubin",
+        "0",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO0-local-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO0.cubin",
+        "0",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO0-global-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO0.cubin",
+        "1",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO0-global-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO0.cubin",
+        "1",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO0-shared-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO0.cubin",
+        "2",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO0-shared-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO0.cubin",
+        "2",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO0-local-reference-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO0.cubin",
+        "3",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO0-local-reference-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO0.cubin",
+        "3",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "assemble-runtime-O0-ptxasO3",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/ptxas",
+        "-arch=sm_110",
+        "-O3",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0.ptx",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO3.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "sass-runtime-O0-ptxasO3",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/nvdisasm",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO3.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO3-local-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO3.cubin",
+        "0",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO3-local-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO3.cubin",
+        "0",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO3-global-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO3.cubin",
+        "1",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO3-global-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO3.cubin",
+        "1",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO3-shared-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO3.cubin",
+        "2",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO3-shared-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO3.cubin",
+        "2",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO3-local-reference-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO3.cubin",
+        "3",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O0-ptxasO3-local-reference-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O0-ptxasO3.cubin",
+        "3",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "llc-minimal-O2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/build/bin/llc",
+        "-O2",
+        "-mcpu=sm_110",
+        "-mattr=+ptx91",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/perf-tail-return-runtime-source/minimal.ll",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O2.ptx"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "assemble-minimal-O2-ptxasO0",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/ptxas",
+        "-arch=sm_110",
+        "-O0",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O2.ptx",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O2-ptxasO0.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "sass-minimal-O2-ptxasO0",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/nvdisasm",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O2-ptxasO0.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-minimal-O2-ptxasO0",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O2-ptxasO0.cubin",
+        "minimal"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "assemble-minimal-O2-ptxasO3",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/ptxas",
+        "-arch=sm_110",
+        "-O3",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O2.ptx",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O2-ptxasO3.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "sass-minimal-O2-ptxasO3",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/nvdisasm",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O2-ptxasO3.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-minimal-O2-ptxasO3",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/minimal-O2-ptxasO3.cubin",
+        "minimal"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "llc-runtime-O2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/build/bin/llc",
+        "-O2",
+        "-mcpu=sm_110",
+        "-mattr=+ptx91",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/perf-tail-return-runtime-source/runtime.ll",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2.ptx"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "assemble-runtime-O2-ptxasO0",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/ptxas",
+        "-arch=sm_110",
+        "-O0",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2.ptx",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO0.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "sass-runtime-O2-ptxasO0",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/nvdisasm",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO0.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO0-local-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO0.cubin",
+        "0",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO0-local-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO0.cubin",
+        "0",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO0-global-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO0.cubin",
+        "1",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO0-global-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO0.cubin",
+        "1",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO0-shared-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO0.cubin",
+        "2",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO0-shared-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO0.cubin",
+        "2",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO0-local-reference-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO0.cubin",
+        "3",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO0-local-reference-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO0.cubin",
+        "3",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "assemble-runtime-O2-ptxasO3",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/ptxas",
+        "-arch=sm_110",
+        "-O3",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2.ptx",
+        "-o",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO3.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "sass-runtime-O2-ptxasO3",
+      "argv": [
+        "/usr/local/cuda-13.2/bin/nvdisasm",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO3.cubin"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO3-local-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO3.cubin",
+        "0",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO3-local-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO3.cubin",
+        "0",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO3-global-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO3.cubin",
+        "1",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO3-global-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO3.cubin",
+        "1",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO3-shared-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO3.cubin",
+        "2",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO3-shared-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO3.cubin",
+        "2",
+        "2"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO3-local-reference-expected1",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO3.cubin",
+        "3",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "run-runtime-O2-ptxasO3-local-reference-expected2",
+      "argv": [
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/launch",
+        "/home/linyongwei/.cache/llvm-nvptx-pr/validation/thor-generic-tail-returns/runtime-O2-ptxasO3.cubin",
+        "3",
+        "2"
+      ],
+      "returncode": 0
+    }
+  ],
+  "static": [
+    {
+      "case": "minimal-O0",
+      "atom_instructions": [
+        "atom.relaxed.sys.cas.b32 \t%r1, [%rd1], 1, 7;"
+      ],
+      "address_space_checks": [
+        "isspacep.local \t%p1, %rd1;"
+      ],
+      "has_out_of_line_call": true,
+      "ptx_sha256": "d4736597382b19b2cd2c6394d7da935c26ea8cc0ecfa47a59980fa6623d92e36"
+    },
+    {
+      "case": "runtime-O0",
+      "atom_instructions": [
+        "atom.relaxed.sys.cas.b32 \t%r2, [%rd1], %r1, 7;",
+        "atom.relaxed.sys.cas.b32 \t%r2, [%rd1], %r1, 7;"
+      ],
+      "address_space_checks": [
+        "isspacep.local \t%p1, %rd1;",
+        "isspacep.local \t%p1, %rd1;",
+        "isspacep.local \t%p1, %rd1;"
+      ],
+      "has_out_of_line_call": true,
+      "ptx_sha256": "8383fd5282f70d13c79051cd610bb5929fbdba59239a4224add8287dfebeaa03"
+    },
+    {
+      "case": "minimal-O2",
+      "atom_instructions": [
+        "atom.relaxed.sys.cas.b32 \t%r1, [%rd1], 1, 7;"
+      ],
+      "address_space_checks": [
+        "isspacep.local \t%p1, %rd1;"
+      ],
+      "has_out_of_line_call": true,
+      "ptx_sha256": "a37f80030a1223df81edbbb8dd2320ed1fa8bfd072faa24af0eb288bc973e35f"
+    },
+    {
+      "case": "runtime-O2",
+      "atom_instructions": [
+        "atom.relaxed.sys.cas.b32 \t%r2, [%rd1], %r1, 7;",
+        "atom.relaxed.sys.cas.b32 \t%r2, [%rd1], %r1, 7;"
+      ],
+      "address_space_checks": [
+        "isspacep.local \t%p1, %rd1;",
+        "isspacep.local \t%p1, %rd1;",
+        "isspacep.local \t%p1, %rd1;"
+      ],
+      "has_out_of_line_call": true,
+      "ptx_sha256": "b9a2263dbdd6f9161afe2b074562053a0a674e0c0ac1eb915cba108fa12fd907"
+    }
+  ],
+  "runtime": [
+    {
+      "case": "run-minimal-O0-ptxasO0",
+      "space": "minimal-local",
+      "llc_optimization": 0,
+      "ptxas_optimization": 0,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=1\nminimal old=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-minimal-O0-ptxasO3",
+      "space": "minimal-local",
+      "llc_optimization": 0,
+      "ptxas_optimization": 3,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=1\nminimal old=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO0-local-expected1",
+      "space": "local",
+      "llc_optimization": 0,
+      "ptxas_optimization": 0,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=1\nold=1 success=1 after=7 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO0-local-expected2",
+      "space": "local",
+      "llc_optimization": 0,
+      "ptxas_optimization": 0,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=2\nold=1 success=0 after=1 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO0-global-expected1",
+      "space": "global",
+      "llc_optimization": 0,
+      "ptxas_optimization": 0,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=1 expected=1\nold=1 success=1 after=7 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO0-global-expected2",
+      "space": "global",
+      "llc_optimization": 0,
+      "ptxas_optimization": 0,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=1 expected=2\nold=1 success=0 after=1 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO0-shared-expected1",
+      "space": "shared",
+      "llc_optimization": 0,
+      "ptxas_optimization": 0,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=2 expected=1\nold=1 success=1 after=7 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO0-shared-expected2",
+      "space": "shared",
+      "llc_optimization": 0,
+      "ptxas_optimization": 0,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=2 expected=2\nold=1 success=0 after=1 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO0-local-reference-expected1",
+      "space": "local-reference",
+      "llc_optimization": 0,
+      "ptxas_optimization": 0,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=3 expected=1\nold=1 success=1 after=7 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO0-local-reference-expected2",
+      "space": "local-reference",
+      "llc_optimization": 0,
+      "ptxas_optimization": 0,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=3 expected=2\nold=1 success=0 after=1 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO3-local-expected1",
+      "space": "local",
+      "llc_optimization": 0,
+      "ptxas_optimization": 3,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=1\nold=1 success=1 after=7 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO3-local-expected2",
+      "space": "local",
+      "llc_optimization": 0,
+      "ptxas_optimization": 3,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=2\nold=1 success=0 after=1 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO3-global-expected1",
+      "space": "global",
+      "llc_optimization": 0,
+      "ptxas_optimization": 3,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=1 expected=1\nold=1 success=1 after=7 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO3-global-expected2",
+      "space": "global",
+      "llc_optimization": 0,
+      "ptxas_optimization": 3,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=1 expected=2\nold=1 success=0 after=1 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO3-shared-expected1",
+      "space": "shared",
+      "llc_optimization": 0,
+      "ptxas_optimization": 3,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=2 expected=1\nold=1 success=1 after=7 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO3-shared-expected2",
+      "space": "shared",
+      "llc_optimization": 0,
+      "ptxas_optimization": 3,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=2 expected=2\nold=1 success=0 after=1 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO3-local-reference-expected1",
+      "space": "local-reference",
+      "llc_optimization": 0,
+      "ptxas_optimization": 3,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=3 expected=1\nold=1 success=1 after=7 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O0-ptxasO3-local-reference-expected2",
+      "space": "local-reference",
+      "llc_optimization": 0,
+      "ptxas_optimization": 3,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=3 expected=2\nold=1 success=0 after=1 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-minimal-O2-ptxasO0",
+      "space": "minimal-local",
+      "llc_optimization": 2,
+      "ptxas_optimization": 0,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=1\nminimal old=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-minimal-O2-ptxasO3",
+      "space": "minimal-local",
+      "llc_optimization": 2,
+      "ptxas_optimization": 3,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=1\nminimal old=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO0-local-expected1",
+      "space": "local",
+      "llc_optimization": 2,
+      "ptxas_optimization": 0,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=1\nold=1 success=1 after=7 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO0-local-expected2",
+      "space": "local",
+      "llc_optimization": 2,
+      "ptxas_optimization": 0,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=2\nold=1 success=0 after=1 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO0-global-expected1",
+      "space": "global",
+      "llc_optimization": 2,
+      "ptxas_optimization": 0,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=1 expected=1\nold=1 success=1 after=7 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO0-global-expected2",
+      "space": "global",
+      "llc_optimization": 2,
+      "ptxas_optimization": 0,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=1 expected=2\nold=1 success=0 after=1 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO0-shared-expected1",
+      "space": "shared",
+      "llc_optimization": 2,
+      "ptxas_optimization": 0,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=2 expected=1\nold=1 success=1 after=7 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO0-shared-expected2",
+      "space": "shared",
+      "llc_optimization": 2,
+      "ptxas_optimization": 0,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=2 expected=2\nold=1 success=0 after=1 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO0-local-reference-expected1",
+      "space": "local-reference",
+      "llc_optimization": 2,
+      "ptxas_optimization": 0,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=3 expected=1\nold=1 success=1 after=7 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO0-local-reference-expected2",
+      "space": "local-reference",
+      "llc_optimization": 2,
+      "ptxas_optimization": 0,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=3 expected=2\nold=1 success=0 after=1 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO3-local-expected1",
+      "space": "local",
+      "llc_optimization": 2,
+      "ptxas_optimization": 3,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=1\nold=1 success=1 after=7 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO3-local-expected2",
+      "space": "local",
+      "llc_optimization": 2,
+      "ptxas_optimization": 3,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=0 expected=2\nold=1 success=0 after=1 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO3-global-expected1",
+      "space": "global",
+      "llc_optimization": 2,
+      "ptxas_optimization": 3,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=1 expected=1\nold=1 success=1 after=7 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO3-global-expected2",
+      "space": "global",
+      "llc_optimization": 2,
+      "ptxas_optimization": 3,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=1 expected=2\nold=1 success=0 after=1 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO3-shared-expected1",
+      "space": "shared",
+      "llc_optimization": 2,
+      "ptxas_optimization": 3,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=2 expected=1\nold=1 success=1 after=7 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO3-shared-expected2",
+      "space": "shared",
+      "llc_optimization": 2,
+      "ptxas_optimization": 3,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=2 expected=2\nold=1 success=0 after=1 is_local=0 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO3-local-reference-expected1",
+      "space": "local-reference",
+      "llc_optimization": 2,
+      "ptxas_optimization": 3,
+      "expected_operand": 1,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=3 expected=1\nold=1 success=1 after=7 is_local=1 result=PASS\n",
+      "stderr": ""
+    },
+    {
+      "case": "run-runtime-O2-ptxasO3-local-reference-expected2",
+      "space": "local-reference",
+      "llc_optimization": 2,
+      "ptxas_optimization": 3,
+      "expected_operand": 2,
+      "returncode": 0,
+      "result": "PASS",
+      "stdout": "device=NVIDIA Thor sm=110 driver=13000 space=3 expected=2\nold=1 success=0 after=1 is_local=1 result=PASS\n",
+      "stderr": ""
+    }
+  ],
+  "llc_version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: \n  Host CPU: neoverse-v3ae\n\n  Registered Targets:\n    nvptx   - NVIDIA PTX 32-bit\n    nvptx64 - NVIDIA PTX 64-bit\n",
+  "ptxas_version": "ptxas: NVIDIA (R) Ptx optimizing assembler\nCopyright (c) 2005-2026 NVIDIA Corporation\nBuilt on Mon_Mar_02_09:52:54_PM_PST_2026\nCuda compilation tools, release 13.2, V13.2.51\nBuild cuda_13.2.r13.2/compiler.37434383_0\n",
+  "completed": true,
+  "finished_utc": "2026-11-11T03:46:56.633545+00:00"
+}

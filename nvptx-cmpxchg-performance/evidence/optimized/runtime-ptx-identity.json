@@ -1,0 +1,50 @@
+[
+  {
+    "fixture": "thor-generic-tail",
+    "stem": "minimal",
+    "O": 0,
+    "byte_identical_to_runtime_test": true
+  },
+  {
+    "fixture": "thor-generic-tail",
+    "stem": "minimal",
+    "O": 2,
+    "byte_identical_to_runtime_test": true
+  },
+  {
+    "fixture": "thor-generic-tail",
+    "stem": "runtime",
+    "O": 0,
+    "byte_identical_to_runtime_test": true
+  },
+  {
+    "fixture": "thor-generic-tail",
+    "stem": "runtime",
+    "O": 2,
+    "byte_identical_to_runtime_test": true
+  },
+  {
+    "fixture": "thor-generic-tail-returns",
+    "stem": "minimal",
+    "O": 0,
+    "byte_identical_to_runtime_test": true
+  },
+  {
+    "fixture": "thor-generic-tail-returns",
+    "stem": "minimal",
+    "O": 2,
+    "byte_identical_to_runtime_test": true
+  },
+  {
+    "fixture": "thor-generic-tail-returns",
+    "stem": "runtime",
+    "O": 0,
+    "byte_identical_to_runtime_test": true
+  },
+  {
+    "fixture": "thor-generic-tail-returns",
+    "stem": "runtime",
+    "O": 2,
+    "byte_identical_to_runtime_test": true
+  }
+]

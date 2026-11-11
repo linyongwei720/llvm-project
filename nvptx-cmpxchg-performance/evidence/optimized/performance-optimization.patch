@@ -1,0 +1,220 @@
+diff --git a/llvm/lib/Target/NVPTX/NVPTXISelLowering.cpp b/llvm/lib/Target/NVPTX/NVPTXISelLowering.cpp
+index fde6cfe7..769a3233 100644
+--- a/llvm/lib/Target/NVPTX/NVPTXISelLowering.cpp
++++ b/llvm/lib/Target/NVPTX/NVPTXISelLowering.cpp
+@@ -8200,29 +8200,42 @@ void NVPTXTargetLowering::emitExpandAtomicCmpXchg(AtomicCmpXchgInst *CI) const {
+   LLVMContext &Ctx = CI->getContext();
+   Value *Addr = CI->getPointerOperand();
+   Value *IsLocal = Builder.CreateIntrinsic(Intrinsic::nvvm_isspacep_local,
+-                                         {Addr}, nullptr, "is.local");
++                                           {Addr}, nullptr, "is.local");
+   BasicBlock *BB = CI->getParent();
+   Function *F = BB->getParent();
+   BasicBlock *ExitBB = BB->splitBasicBlock(CI->getIterator(), "cmpxchg.end");
++  auto *Ret = dyn_cast<ReturnInst>(ExitBB->getTerminator());
++  auto *Extract =
++      Ret ? dyn_cast_or_null<ExtractValueInst>(Ret->getReturnValue()) : nullptr;
++  bool ReturnsExtract = ExitBB->size() == 3 && CI->hasOneUse() && Extract &&
++                        Extract->hasOneUse() &&
++                        Extract->getParent() == ExitBB &&
++                        Extract->getAggregateOperand() == CI;
+   BasicBlock *LocalBB = BasicBlock::Create(Ctx, "cmpxchg.local", F, ExitBB);
+-  BasicBlock *AtomicBB = BasicBlock::Create(Ctx, "cmpxchg.atomic", F, ExitBB);
++  BasicBlock *AtomicBB = BasicBlock::Create(Ctx, "cmpxchg.atomic", F,
++                                            ReturnsExtract ? LocalBB : ExitBB);
+ 
+   BB->getTerminator()->eraseFromParent();
+   Builder.SetInsertPoint(BB);
+   Builder.CreateCondBr(IsLocal, LocalBB, AtomicBB);
+ 
+   Builder.SetInsertPoint(LocalBB);
+-  Value *LocalAddr = Builder.CreateAddrSpaceCast(
+-      Addr, PointerType::get(Ctx, NVPTXAS::ADDRESS_SPACE_LOCAL));
+-  auto [Old, Success] =
+-      buildCmpXchgValue(Builder, LocalAddr, CI->getCompareOperand(),
+-                       CI->getNewValOperand(), CI->getAlign(), CI->isVolatile());
++  // Ordinary generic loads/stores support local memory. The branch proves the
++  // access is thread-private, so no address-space conversion is needed here.
++  auto [Old, Success] = buildCmpXchgValue(
++      Builder, Addr, CI->getCompareOperand(), CI->getNewValOperand(),
++      CI->getAlign(), CI->isVolatile());
+   Value *LocalResult = nullptr;
+-  if (!CI->use_empty()) {
+-    LocalResult = Builder.CreateInsertValue(PoisonValue::get(CI->getType()), Old, 0);
++  if (ReturnsExtract) {
++    Builder.CreateRet(Extract->getIndices()[0] == 0 ? Old : Success)
++        ->setDebugLoc(Ret->getDebugLoc());
++  } else if (!CI->use_empty()) {
++    LocalResult =
++        Builder.CreateInsertValue(PoisonValue::get(CI->getType()), Old, 0);
+     LocalResult = Builder.CreateInsertValue(LocalResult, Success, 1);
+   }
+-  Builder.CreateBr(ExitBB);
++  if (!ReturnsExtract)
++    Builder.CreateBr(ExitBB);
+ 
+   CI->removeFromParent();
+   CI->insertInto(AtomicBB, AtomicBB->end());
+@@ -8230,15 +8243,24 @@ void NVPTXTargetLowering::emitExpandAtomicCmpXchg(AtomicCmpXchgInst *CI) const {
+   // remaining atomic so it is not expanded again, while retaining any existing
+   // address-space exclusions. Normal fence/partword lowering then applies only
+   // to the atomic path.
+-  MDNode *NotLocal = MDBuilder(Ctx).createRange(
+-      APInt(32, NVPTXAS::ADDRESS_SPACE_LOCAL),
+-      APInt(32, NVPTXAS::ADDRESS_SPACE_LOCAL + 1));
++  MDNode *NotLocal =
++      MDBuilder(Ctx).createRange(APInt(32, NVPTXAS::ADDRESS_SPACE_LOCAL),
++                                 APInt(32, NVPTXAS::ADDRESS_SPACE_LOCAL + 1));
+   if (MDNode *Existing = CI->getMetadata(LLVMContext::MD_noalias_addrspace)) {
+     if (MDNode *Merged = MDNode::getMostGenericRange(Existing, NotLocal))
+       NotLocal = Merged;
+   }
+   CI->setMetadata(LLVMContext::MD_noalias_addrspace, NotLocal);
+   Builder.SetInsertPoint(AtomicBB);
++  if (ReturnsExtract) {
++    // A wrapper returning just the old value or success flag need not merge
++    // the aggregate and branch to a common return. Keep both returns local to
++    // their paths, with the native atomic first in the block layout.
++    Builder.CreateRet(Builder.CreateExtractValue(CI, Extract->getIndices()[0]))
++        ->setDebugLoc(Ret->getDebugLoc());
++    ExitBB->eraseFromParent();
++    return;
++  }
+   Builder.CreateBr(ExitBB);
+ 
+   if (LocalResult) {
+diff --git a/llvm/test/CodeGen/NVPTX/cmpxchg-generic-local.ll b/llvm/test/CodeGen/NVPTX/cmpxchg-generic-local.ll
+index 7e78e3c0..fc5e0053 100644
+--- a/llvm/test/CodeGen/NVPTX/cmpxchg-generic-local.ll
++++ b/llvm/test/CodeGen/NVPTX/cmpxchg-generic-local.ll
+@@ -8,9 +8,8 @@
+ define i32 @generic_cas(ptr %p, i32 %cmp, i32 %new) noinline {
+ ; CHECK-LABEL: generic_cas(
+ ; CHECK: isspacep.local
+-; CHECK-DAG: cvta.to.local.u64
+-; CHECK-DAG: ld.local.b32
+-; CHECK-DAG: st.local.b32
++; CHECK-DAG: ld.b32
++; CHECK-DAG: st.b32
+ ; CHECK-DAG: atom.relaxed.sys.cas.b32
+ ; CHECK: ret;
+   %pair = cmpxchg ptr %p, i32 %cmp, i32 %new monotonic monotonic, align 4
+diff --git a/llvm/test/Transforms/AtomicExpand/NVPTX/cmpxchg-generic-local.ll b/llvm/test/Transforms/AtomicExpand/NVPTX/cmpxchg-generic-local.ll
+index 9cce792e..6e35cc68 100644
+--- a/llvm/test/Transforms/AtomicExpand/NVPTX/cmpxchg-generic-local.ll
++++ b/llvm/test/Transforms/AtomicExpand/NVPTX/cmpxchg-generic-local.ll
+@@ -7,11 +7,10 @@ define { i32, i1 } @generic_i32(ptr %p, i32 %cmp, i32 %new) {
+ ; CHECK: [[ISLOCAL:%.*]] = call i1 @llvm.nvvm.isspacep.local(ptr %p)
+ ; CHECK-NEXT: br i1 [[ISLOCAL]], label %cmpxchg.local, label %cmpxchg.atomic
+ ; CHECK: cmpxchg.local:
+-; CHECK-NEXT: [[LOCAL:%.*]] = addrspacecast ptr %p to ptr addrspace(5)
+-; CHECK-NEXT: [[OLD:%.*]] = load i32, ptr addrspace(5) [[LOCAL]], align 4
++; CHECK-NEXT: [[OLD:%.*]] = load i32, ptr %p, align 4
+ ; CHECK-NEXT: [[EQUAL:%.*]] = icmp eq i32 [[OLD]], %cmp
+ ; CHECK-NEXT: [[NEXT:%.*]] = select i1 [[EQUAL]], i32 %new, i32 [[OLD]]
+-; CHECK-NEXT: store i32 [[NEXT]], ptr addrspace(5) [[LOCAL]], align 4
++; CHECK-NEXT: store i32 [[NEXT]], ptr %p, align 4
+ ; CHECK-NEXT: [[PAIR0:%.*]] = insertvalue { i32, i1 } poison, i32 [[OLD]], 0
+ ; CHECK-NEXT: [[PAIR1:%.*]] = insertvalue { i32, i1 } [[PAIR0]], i1 [[EQUAL]], 1
+ ; CHECK-NEXT: br label %cmpxchg.end
+@@ -25,6 +24,78 @@ define { i32, i1 } @generic_i32(ptr %p, i32 %cmp, i32 %new) {
+   ret { i32, i1 } %pair
+ }
+ 
++; Returning a single component does not need an aggregate or a common return.
++define i32 @return_old(ptr %p, i32 %cmp, i32 %new) {
++; CHECK-LABEL: define i32 @return_old(
++; CHECK: call i1 @llvm.nvvm.isspacep.local(ptr %p)
++; CHECK: cmpxchg.atomic:
++; CHECK-NEXT: [[CAS:%.*]] = cmpxchg ptr %p, i32 %cmp, i32 %new monotonic monotonic, align 4, !noalias.addrspace ![[NOTLOCAL]]
++; CHECK-NEXT: [[ATOMICOLD:%.*]] = extractvalue { i32, i1 } [[CAS]], 0
++; CHECK-NEXT: ret i32 [[ATOMICOLD]]
++; CHECK: cmpxchg.local:
++; CHECK: [[LOCALOLD:%.*]] = load i32, ptr %p, align 4
++; CHECK: store i32 {{%.*}}, ptr %p, align 4
++; CHECK-NEXT: ret i32 [[LOCALOLD]]
++; CHECK-NEXT: }
++  %pair = cmpxchg ptr %p, i32 %cmp, i32 %new monotonic monotonic, align 4
++  %old = extractvalue { i32, i1 } %pair, 0
++  ret i32 %old
++}
++
++define i1 @return_success(ptr %p, i32 %cmp, i32 %new) {
++; CHECK-LABEL: define i1 @return_success(
++; CHECK: call i1 @llvm.nvvm.isspacep.local(ptr %p)
++; CHECK: cmpxchg.atomic:
++; CHECK-NEXT: [[CAS:%.*]] = cmpxchg ptr %p, i32 %cmp, i32 %new monotonic monotonic, align 4, !noalias.addrspace ![[NOTLOCAL]]
++; CHECK-NEXT: [[ATOMICOK:%.*]] = extractvalue { i32, i1 } [[CAS]], 1
++; CHECK-NEXT: ret i1 [[ATOMICOK]]
++; CHECK: cmpxchg.local:
++; CHECK: [[LOCALOK:%.*]] = icmp eq i32 {{%.*}}, %cmp
++; CHECK: store i32 {{%.*}}, ptr %p, align 4
++; CHECK-NEXT: ret i1 [[LOCALOK]]
++; CHECK-NEXT: }
++  %pair = cmpxchg ptr %p, i32 %cmp, i32 %new monotonic monotonic, align 4
++  %success = extractvalue { i32, i1 } %pair, 1
++  ret i1 %success
++}
++
++; Tail returns still allow normal fence insertion on the native path.
++define i64 @return_old_seq_cst(ptr %p, i64 %cmp, i64 %new) {
++; CHECK-LABEL: define i64 @return_old_seq_cst(
++; CHECK: cmpxchg.atomic:
++; CHECK-NEXT: fence syncscope("device") seq_cst
++; CHECK-NEXT: [[CAS:%.*]] = cmpxchg volatile ptr %p, i64 %cmp, i64 %new syncscope("device") acquire acquire, align 16, !noalias.addrspace ![[NOTLOCAL]]
++; CHECK-NEXT: [[ATOMICOLD:%.*]] = extractvalue { i64, i1 } [[CAS]], 0
++; CHECK-NEXT: ret i64 [[ATOMICOLD]]
++; CHECK: cmpxchg.local:
++; CHECK-NOT: fence
++; CHECK: [[LOCALOLD:%.*]] = load volatile i64, ptr %p, align 16
++; CHECK: store volatile i64 {{%.*}}, ptr %p, align 16
++; CHECK-NEXT: ret i64 [[LOCALOLD]]
++; CHECK-NEXT: }
++  %pair = cmpxchg volatile ptr %p, i64 %cmp, i64 %new syncscope("device") seq_cst seq_cst, align 16
++  %old = extractvalue { i64, i1 } %pair, 0
++  ret i64 %old
++}
++
++declare void @side_effect()
++
++; Preserve work after the CAS, executing it once after the paths merge.
++define i32 @return_old_with_side_effect(ptr %p, i32 %cmp, i32 %new) {
++; CHECK-LABEL: define i32 @return_old_with_side_effect(
++; CHECK: cmpxchg.local:
++; CHECK: br label %cmpxchg.end
++; CHECK: cmpxchg.atomic:
++; CHECK: br label %cmpxchg.end
++; CHECK: cmpxchg.end:
++; CHECK: call void @side_effect()
++; CHECK-NEXT: ret i32
++  %pair = cmpxchg ptr %p, i32 %cmp, i32 %new monotonic monotonic, align 4
++  %old = extractvalue { i32, i1 } %pair, 0
++  call void @side_effect()
++  ret i32 %old
++}
++
+ ; Strong ordering, syncscope, weak, and volatile remain on the nonlocal path.
+ ; The local path preserves volatility and an explicitly stronger alignment.
+ define { i64, i1 } @generic_volatile_i64(ptr %p, i64 %cmp, i64 %new) {
+@@ -32,8 +103,8 @@ define { i64, i1 } @generic_volatile_i64(ptr %p, i64 %cmp, i64 %new) {
+ ; CHECK: call i1 @llvm.nvvm.isspacep.local(ptr %p)
+ ; CHECK: cmpxchg.local:
+ ; CHECK-NOT: fence
+-; CHECK: [[OLD64:%.*]] = load volatile i64, ptr addrspace(5) {{%.*}}, align 16
+-; CHECK: store volatile i64 {{%.*}}, ptr addrspace(5) {{%.*}}, align 16
++; CHECK: [[OLD64:%.*]] = load volatile i64, ptr %p, align 16
++; CHECK: store volatile i64 {{%.*}}, ptr %p, align 16
+ ; CHECK-NOT: fence
+ ; CHECK: cmpxchg.atomic:
+ ; CHECK-NEXT: fence syncscope("device") seq_cst
+@@ -47,8 +118,8 @@ define { i8, i1 } @generic_i8(ptr %p, i8 %cmp, i8 %new) {
+ ; CHECK-LABEL: define { i8, i1 } @generic_i8(
+ ; CHECK: call i1 @llvm.nvvm.isspacep.local(ptr %p)
+ ; CHECK: cmpxchg.local:
+-; CHECK: load i8, ptr addrspace(5) {{%.*}}, align 1
+-; CHECK: store i8 {{%.*}}, ptr addrspace(5) {{%.*}}, align 1
++; CHECK: load i8, ptr %p, align 1
++; CHECK: store i8 {{%.*}}, ptr %p, align 1
+ ; CHECK: cmpxchg.atomic:
+ ; CHECK: cmpxchg ptr {{%.*}}, i32 {{%.*}}, i32 {{%.*}} monotonic monotonic
+   %pair = cmpxchg ptr %p, i8 %cmp, i8 %new monotonic monotonic, align 1
